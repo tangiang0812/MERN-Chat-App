@@ -8,6 +8,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
+require("dotenv").config();
+const connectDB = require("./connectDB");
+connectDB();
+
 const server = require("http").createServer(app);
 
 // const PORT = process.env.PORT || 8000;
