@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+const userRoutes = require("./routes/userRoutes");
 
 const rooms = ["general", "tech", "finance", "crypto"];
 
@@ -12,10 +14,14 @@ require("dotenv").config();
 const connectDB = require("./connectDB");
 connectDB();
 
-const server = require("http").createServer(app);
+app.use("/api/user", userRoutes);
 
-// const PORT = process.env.PORT || 8000;
-const PORT = 8000;
+app.use(notFound);
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 4000;
+
+const server = require("http").createServer(app);
 
 const io = require("socket.io")(server, {
   cors: {
