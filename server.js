@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const userRoutes = require("./routes/userRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 
 const rooms = ["general", "tech", "finance", "crypto"];
 
@@ -15,6 +16,7 @@ const connectDB = require("./config/connectDB");
 connectDB();
 
 app.use("/api/user", userRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

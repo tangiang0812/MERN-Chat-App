@@ -37,7 +37,7 @@ const userSchema = new Schema(
       default: "offline",
     },
   },
-  { minimize: false }
+  { minimize: false, timestamps: true }
 );
 
 userSchema.methods.matchedPassword = async function (enteredPassword) {
