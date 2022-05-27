@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(cors());
 
 require("dotenv").config();
-const connectDB = require("./connectDB");
+const connectDB = require("./config/connectDB");
 connectDB();
 
 app.use("/api/user", userRoutes);

@@ -24,6 +24,9 @@ const userSchema = new Schema(
     },
     picture: {
       type: String,
+      required: true,
+      default:
+        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
     newMessages: {
       type: Object,
@@ -44,9 +47,7 @@ userSchema.methods.matchedPassword = async function (enteredPassword) {
 };
 
 userSchema.pre("save", async function (next) {
-  console.log(this.isModified("password"));
   if (!this.isModified("password")) return next();
-
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
