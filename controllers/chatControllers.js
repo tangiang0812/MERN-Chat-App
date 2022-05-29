@@ -23,7 +23,7 @@ const accessChat = asyncHandler(async (req, res) => {
       path: "latestMessage",
       populate: {
         path: "sender",
-        select: "name pic email",
+        select: "name picture email",
       },
     });
 
@@ -54,10 +54,7 @@ const accessChat = asyncHandler(async (req, res) => {
     try {
       const createdChat = await Chat.create(chatData);
 
-      const fullChat = await Chat.findOne({ _id: createdChat._id }).populate(
-        "users",
-        "-password"
-      );
+      const fullChat = await createdChat.populate("users", "-password");
 
       res.status(200).send(fullChat);
     } catch (e) {
@@ -78,7 +75,7 @@ const fetchChats = asyncHandler(async (req, res) => {
         path: "latestMessage",
         populate: {
           path: "sender",
-          select: "name pic email",
+          select: "name picture email",
         },
       })
       .sort({ updatedAt: -1 });
