@@ -92,13 +92,13 @@ const fetchChats = asyncHandler(async (req, res) => {
 
 const createGroupChat = asyncHandler(async (req, res) => {
   if (!req.body.users || !req.body.name) {
-    return res.status(400).send({ message: "Please fill all the fields" });
+    return res.status(400).json({ message: "Please fill all the fields" });
   }
 
   const users = req.body.users;
 
   if (users.length < 2) {
-    return res.status(400).send("More the 2 users are required");
+    return res.status(400).json({ message: "More the 2 users are required" });
   }
 
   users.push(req.user);
@@ -123,6 +123,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
 });
 
 const renameGroup = asyncHandler(async (req, res) => {
+  console.log(req.body);
   const { chatId, chatName } = req.body;
   const updatedChat = await Chat.findByIdAndUpdate(
     chatId,
@@ -141,6 +142,7 @@ const renameGroup = asyncHandler(async (req, res) => {
 });
 
 const addToGroup = asyncHandler(async (req, res) => {
+  console.log(req.body);
   const { chatId, userId } = req.body;
 
   const updatedChat = await Chat.findByIdAndUpdate(

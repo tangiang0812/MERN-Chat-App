@@ -11,6 +11,7 @@ const registerUser = AsyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Email has been used!");
   }
+
   const user = await User.create({ name, email, password, picture });
   if (user) {
     res.status(201).json({
