@@ -1,7 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
 const { create } = require("../models/userModel");
-const User = require("../models/userModel");
 
 const accessChat = asyncHandler(async (req, res) => {
   const { userId } = req.body;
@@ -26,21 +25,6 @@ const accessChat = asyncHandler(async (req, res) => {
         select: "name picture email",
       },
     });
-
-  // var isChat = await Chat.find({
-  //   isGroupChat: false,
-  //   $: [
-  //     { users: { $elementMatch: { $eq: req.user._id } } },
-  //     { users: { $elementMatch: { userId } } },
-  //   ],
-  // })
-  //   .populate("users", "-password")
-  //   .populate("latestMessage");
-
-  // isChat = await User.populate(isChat, {
-  //   path: "latestMessage.sender",
-  //   select: "name pic email",
-  // });
 
   if (isChat.length > 0) {
     res.send(isChat[0]);
@@ -120,7 +104,6 @@ const createGroupChat = asyncHandler(async (req, res) => {
 });
 
 const renameGroup = asyncHandler(async (req, res) => {
-  console.log(req.body);
   const { chatId, chatName } = req.body;
   const updatedChat = await Chat.findByIdAndUpdate(
     chatId,
@@ -139,7 +122,6 @@ const renameGroup = asyncHandler(async (req, res) => {
 });
 
 const addToGroup = asyncHandler(async (req, res) => {
-  console.log(req.body);
   const { chatId, userId } = req.body;
 
   const updatedChat = await Chat.findByIdAndUpdate(

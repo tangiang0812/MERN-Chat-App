@@ -1,10 +1,9 @@
 const asyncHandler = require("express-async-handler");
 const Message = require("../models/messageModel");
-const User = require("../models/userModel");
 const Chat = require("../models/chatModel");
 
 const fetchMessages = asyncHandler(async (req, res) => {
-  const { chatId } = req.body;
+  const { chatId } = req.params;
   try {
     const messages = await Message.find({ chat: chatId })
       .populate("sender", "name picture email")
