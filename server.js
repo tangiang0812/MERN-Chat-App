@@ -39,13 +39,13 @@ const io = require("socket.io")(server, {
 io.use(function (socket, next) {
   // console.log(socket);
   if (socket.handshake.auth && socket.handshake.auth.token) {
-    console.log(socket.handshake.auth);
+    // console.log(socket.handshake.auth);
     jwt.verify(
       socket.handshake.auth.token,
       process.env.JWT_SECRET,
       function (err, decoded) {
         if (err) return next(new Error("Authentication error"));
-        console.log("authentication success");
+        // console.log("authentication success");
         socket.decoded = decoded;
         next();
       }
