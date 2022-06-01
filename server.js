@@ -15,6 +15,7 @@ app.use(cors());
 
 require("dotenv").config();
 const connectDB = require("./config/connectDB");
+const Chat = require("./models/chatModel");
 connectDB();
 
 app.use("/api/user", userRoutes);
@@ -36,7 +37,7 @@ const io = require("socket.io")(server, {
   },
 });
 
-io.use(function (socket, next) {
+io.use((socket, next) => {
   // console.log(socket);
   if (socket.handshake.auth && socket.handshake.auth.token) {
     // console.log(socket.handshake.auth);
@@ -56,22 +57,36 @@ io.use(function (socket, next) {
 }).on("connection", (socket) => {
   socket.on("setup", (user) => {
     socket.join(user._id);
-    console.log(user._id);
+    // console.log(user._id);
     socket.emit("connected");
   });
 
   socket.on("join-chat", (chat) => {
     socket.join(chat);
-    console.log(`User joined room: ${chat}`);
+    // console.log(`User joined room: ${chat}`);
   });
 
-  socket.on("new-message", (receivedMessage) => {
-    const chat = receivedMessage.chat;
+  socket.on("new-message", async (receivedMessage) => {
+    let chat = receivedMessage.chat;
+    console.log(chat);
+    chat = await Chat.findById(chat);
+    console.log(chat);
+
     if (!chat.users) return console.log("chat.users not defined");
 
+    if (!chat.users.find((user) => user.toString() === socket.decoded.id)) {
+      return console.log("User is not a group's member");
+    }
+
+    if (socket.decoded.id !== receivedMessage.sender._id) {
+      return console.log(
+        "Message's sender's ID and socket.decoded.id is not the same"
+      );
+    }
+
     chat.users.forEach((user) => {
-      if (user._id == receivedMessage.sender._id) return;
-      socket.in(user._id).emit("message-received", receivedMessage);
+      if (user.toString() === receivedMessage.sender._id) return;
+      socket.in(user.toString()).emit("message-received", receivedMessage);
     });
   });
 });

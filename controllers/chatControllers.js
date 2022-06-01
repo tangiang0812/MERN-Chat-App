@@ -145,6 +145,9 @@ const addToGroup = asyncHandler(async (req, res) => {
 const removeFromGroup = asyncHandler(async (req, res) => {
   const { chatId, userId } = req.body;
 
+  console.log(userId);
+  console.log(req.user._id);
+
   let updatedChat = await Chat.findById(chatId);
 
   if (!updatedChat) {
@@ -157,7 +160,10 @@ const removeFromGroup = asyncHandler(async (req, res) => {
     throw new Error("Admin can not leave group");
   }
 
-  if (req.user._id.toString() === updatedChat.groupAdmin.toString()) {
+  if (
+    req.user._id.toString() === updatedChat.groupAdmin.toString() ||
+    req.user._id.toString() === userId
+  ) {
     updatedChat.users = updatedChat.users.filter(
       (user) => user._id.toString() !== userId
     );
