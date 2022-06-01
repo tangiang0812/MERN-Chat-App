@@ -55,8 +55,8 @@ io.use((socket, next) => {
     next(new Error("Authentication error"));
   }
 }).on("connection", (socket) => {
-  socket.on("setup", (user) => {
-    socket.join(user._id);
+  socket.on("setup", () => {
+    socket.join(socket.decoded.id);
     // console.log(user._id);
     socket.emit("connected");
   });
@@ -68,9 +68,7 @@ io.use((socket, next) => {
 
   socket.on("new-message", async (receivedMessage) => {
     let chat = receivedMessage.chat;
-    console.log(chat);
     chat = await Chat.findById(chat);
-    console.log(chat);
 
     if (!chat.users) return console.log("chat.users not defined");
 
