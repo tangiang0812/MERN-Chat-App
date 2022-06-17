@@ -95,7 +95,7 @@ io.use((socket, next) => {
     }
 
     chat.users.forEach((user) => {
-      io.in(user.toString()).emit("message-received", receivedMessage);
+      socket.in(user.toString()).emit("message-received", receivedMessage);
     });
   });
 });

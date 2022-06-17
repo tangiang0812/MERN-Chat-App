@@ -126,7 +126,14 @@ const renameGroup = asyncHandler(async (req, res) => {
     { new: true }
   )
     .populate("users", "-password")
-    .populate("groupAdmin", "-password");
+    .populate("groupAdmin", "-password")
+    .populate({
+      path: "latestMessage",
+      populate: {
+        path: "sender",
+        select: "name picture email",
+      },
+    });
 
   if (!updatedChat) {
     res.status(404);
@@ -147,7 +154,14 @@ const addToGroup = asyncHandler(async (req, res) => {
     { new: true }
   )
     .populate("users", "-password")
-    .populate("groupAdmin", "-password");
+    .populate("groupAdmin", "-password")
+    .populate({
+      path: "latestMessage",
+      populate: {
+        path: "sender",
+        select: "name picture email",
+      },
+    });
 
   if (!updatedChat) {
     res.status(404);
@@ -187,6 +201,13 @@ const removeFromGroup = asyncHandler(async (req, res) => {
 
     updatedChat = await updatedChat.populate("users", "-password");
     updatedChat = await updatedChat.populate("groupAdmin", "-password");
+    updatedChat = await updatedChat.populate({
+      path: "latestMessage",
+      populate: {
+        path: "sender",
+        select: "name picture email",
+      },
+    });
 
     res.status(200).json(updatedChat);
   }
