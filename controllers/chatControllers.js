@@ -1,6 +1,5 @@
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
-const { create } = require("../models/userModel");
 
 const accessChat = asyncHandler(async (req, res) => {
   const { userId } = req.body;
@@ -49,10 +48,26 @@ const accessChat = asyncHandler(async (req, res) => {
 });
 
 const fetchChats = asyncHandler(async (req, res) => {
+  const keyword = req.params.chatId
+    ? {
+        $and: [
+          {
+            users: {
+              $elemMatch: { $eq: req.user._id },
+            },
+          },
+          {
+            _id: { $eq: req.params.chatId },
+          },
+        ],
+      }
+    : {
+        users: {
+          $elemMatch: { $eq: req.user._id },
+        },
+      };
   try {
-    const chats = await Chat.find({
-      users: { $elemMatch: { $eq: req.user._id } },
-    })
+    const chats = await Chat.find(keyword)
       .populate("users", "-password")
       .populate("groupAdmin", "-password")
       .populate({
