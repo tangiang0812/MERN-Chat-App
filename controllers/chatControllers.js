@@ -120,55 +120,89 @@ const createGroupChat = asyncHandler(async (req, res) => {
 
 const renameGroup = asyncHandler(async (req, res) => {
   const { chatId, chatName } = req.body;
-  const updatedChat = await Chat.findByIdAndUpdate(
-    chatId,
-    { chatName },
-    { new: true }
-  )
-    .populate("users", "-password")
-    .populate("groupAdmin", "-password")
-    .populate({
-      path: "latestMessage",
-      populate: {
-        path: "sender",
-        select: "name picture email",
-      },
-    });
+
+  let updatedChat = await Chat.findById(chatId);
 
   if (!updatedChat) {
     res.status(404);
     throw new Error("Chat not found");
-  } else {
-    res.json(updatedChat);
   }
+
+  if (!updatedChat.users) {
+    res.status(400);
+    throw new Error("chat.users not defined");
+  }
+
+  if (
+    !updatedChat.users.find(
+      (user) => user.toString() === req.user._id.toString()
+    )
+  ) {
+    res.status(400);
+    throw new Error("You are not a group's member");
+  }
+
+  updatedChat.chatName = chatName;
+  await updatedChat.save();
+
+  updatedChat = await updatedChat.populate("users", "-password");
+  updatedChat = await updatedChat.populate("groupAdmin", "-password");
+  updatedChat = await updatedChat.populate({
+    path: "latestMessage",
+    populate: {
+      path: "sender",
+      select: "name picture email",
+    },
+  });
+
+  res.status(200).json(updatedChat);
 });
 
 const addToGroup = asyncHandler(async (req, res) => {
   const { chatId, userId } = req.body;
 
-  const updatedChat = await Chat.findByIdAndUpdate(
-    chatId,
-    {
-      $addToSet: { users: { $each: userId } },
-    },
-    { new: true }
-  )
-    .populate("users", "-password")
-    .populate("groupAdmin", "-password")
-    .populate({
-      path: "latestMessage",
-      populate: {
-        path: "sender",
-        select: "name picture email",
-      },
-    });
+  let updatedChat = await Chat.findById(chatId);
 
   if (!updatedChat) {
     res.status(404);
     throw new Error("Chat not found");
-  } else {
-    res.json(updatedChat);
   }
+
+  if (!updatedChat.users) {
+    res.status(400);
+    throw new Error("chat.users not defined");
+  }
+
+  if (
+    !updatedChat.users.find(
+      (user) => user.toString() === req.user._id.toString()
+    )
+  ) {
+    res.status(400);
+    throw new Error("You are not a group's member");
+  }
+
+  for (let u of userId) {
+    if (!updatedChat.users.find((user) => user._id.toString() === u)) {
+      updatedChat.users.push(u);
+    }
+  }
+
+  await updatedChat.save();
+
+  console.log(updatedChat);
+
+  updatedChat = await updatedChat.populate("users", "-password");
+  updatedChat = await updatedChat.populate("groupAdmin", "-password");
+  updatedChat = await updatedChat.populate({
+    path: "latestMessage",
+    populate: {
+      path: "sender",
+      select: "name picture email",
+    },
+  });
+
+  res.status(200).json(updatedChat);
 });
 
 const removeFromGroup = asyncHandler(async (req, res) => {
@@ -182,6 +216,20 @@ const removeFromGroup = asyncHandler(async (req, res) => {
   if (!updatedChat) {
     res.status(400);
     throw new Error("Chat not found");
+  }
+
+  if (!updatedChat.users) {
+    res.status(400);
+    throw new Error("chat.users not defined");
+  }
+
+  if (
+    !updatedChat.users.find(
+      (user) => user.toString() === req.user._id.toString()
+    )
+  ) {
+    res.status(400);
+    throw new Error("You are not a group's member");
   }
 
   if (userId === updatedChat.groupAdmin.toString()) {
@@ -211,23 +259,6 @@ const removeFromGroup = asyncHandler(async (req, res) => {
 
     res.status(200).json(updatedChat);
   }
-
-  // const updatedChat = await Chat.findByIdAndUpdate(
-  //   chatId,
-  //   {
-  //     $pull: { users: userId },
-  //   },
-  //   { new: true }
-  // )
-  //   .populate("users", "-password")
-  //   .populate("groupAdmin", "-password");
-
-  // if (!updatedChat) {
-  //   res.status(404);
-  //   throw new Error("Chat not found");
-  // } else {
-  //   res.json(updatedChat);
-  // }
 });
 
 module.exports = {

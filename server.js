@@ -73,10 +73,10 @@ io.use((socket, next) => {
     socket.emit("connected");
   });
 
-  socket.on("join-chat", (chat) => {
-    socket.join(chat);
-    // console.log(`User joined room: ${chat}`);
-  });
+  // socket.on("join-chat", (chat) => {
+  //   socket.join(chat);
+  //   // console.log(`User joined room: ${chat}`);
+  // });
 
   socket.on("new-message", async (receivedMessage) => {
     let chat = receivedMessage.chat;
