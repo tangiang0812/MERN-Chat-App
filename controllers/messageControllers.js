@@ -43,6 +43,7 @@ const sendMessage = asyncHandler(async (req, res) => {
     await chat.save();
 
     message = await message.populate("sender", "name picture email");
+    message = await message.populate("chat", "chatName isGroupChat users");
     // message = await message.populate({
     //   path: "chat",
     //   populate: {
