@@ -55,7 +55,7 @@ io.use((socket, next) => {
     // console.log(socket.handshake.auth);
     jwt.verify(
       socket.handshake.auth.token,
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || "supersecuresecret",
       function (err, decoded) {
         if (err) return next(new Error("Authentication error"));
         // console.log("authentication success");
